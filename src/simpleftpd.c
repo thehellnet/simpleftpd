@@ -75,7 +75,7 @@ int main(int argc, char **argv) {
         new_sock = accept(sock, (struct sockaddr *) &address, (socklen_t *) &address_len);
         if (new_sock == -1) {
             if (errno == EBADF) {
-                ui_message(UI_INFO, tag, "No accepting new socket connections.");
+                ui_message(UI_INFO, tag, "Socket closed, no accepting new socket connections.");
                 break;
             }
 
@@ -96,6 +96,8 @@ int main(int argc, char **argv) {
 
     stack = stack_first();
     while (stack != NULL) {
+        ui_message(UI_INFO, tag, "Joining worker %d", stack->id);
+
         pthread_join(*stack->pthread, NULL);
 
         old_stack = stack;
@@ -128,6 +130,8 @@ void *thread_function(void *thread_data) {
     worker_main(data);
 
     stack_remove(data->stack);
+
+    ui_message(UI_INFO, tag, "Worker removed from stack. Remaining %d workers.", stack_count());
 
     free(data);
 

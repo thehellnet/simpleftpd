@@ -40,18 +40,23 @@ void stack_init() {
 }
 
 stack_item *stack_add() {
+    stack_item *prev;
     pthread_mutex_lock(&stack_mutex);
+
+    prev = NULL;
 
     if (last == NULL) {
         last = (stack_item *) malloc(sizeof(stack_item));
         first = last;
     } else {
+        prev = last;
         last->next = (stack_item *) malloc(sizeof(stack_item));
         last = last->next;
     }
 
     last->id = next_id;
     last->next = NULL;
+    last->prev = prev;
     last->pthread = (pthread_t *) malloc(sizeof(pthread_t));
 
     next_id++;
@@ -75,9 +80,13 @@ void stack_remove(stack_item *stack) {
 
     if (next != NULL)
         next->prev = prev;
+    else
+        last = prev;
 
     if (prev != NULL)
         prev->next = next;
+    else
+        first = next;
 
     stack_free(stack);
 
@@ -86,6 +95,24 @@ void stack_remove(stack_item *stack) {
 
 stack_item *stack_first() {
     return first;
+}
+
+int stack_count() {
+    int count;
+    stack_item *item;
+
+    pthread_mutex_lock(&stack_mutex);
+
+    count = 0;
+    item = first;
+    while (item != NULL) {
+        count++;
+        item = item->next;
+    }
+
+    pthread_mutex_unlock(&stack_mutex);
+
+    return count;
 }
 
 void stack_free(stack_item *stack) {

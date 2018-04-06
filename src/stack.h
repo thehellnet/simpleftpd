@@ -41,6 +41,8 @@ void stack_remove(stack_item *stack);
 
 stack_item *stack_first();
 
+int stack_count();
+
 void stack_free(stack_item *stack);
 
 #endif
