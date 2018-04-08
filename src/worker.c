@@ -22,17 +22,30 @@
 #include <unistd.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <string.h>
 
 #include "worker.h"
 #include "ui.h"
+#include "libsimpleftp/context.h"
+#include "libsimpleftp/command.h"
 
 static const char *tag = "worker";
 
 void worker_main(worker_data *data) {
     char c;
     ssize_t ln;
+    char buffer[4096];
+    simpleftp_context *context;
+
 
     ui_message(UI_INFO, tag, "Starting worker %d for %s", data->stack->id, inet_ntoa(data->address.sin_addr));
+
+    ui_message(UI_DEBUG, tag, "Init context", data->stack->id);
+    context = NULL;
+    simpleftp_context_init(context);
+
+    simpleftp_response_success_connection_ready(buffer, context);
+    worker_socket_write(data->sock, buffer);
 
     while (1) {
         ln = read(data->sock, &c, 1);
@@ -42,8 +55,16 @@ void worker_main(worker_data *data) {
         ui_message(UI_DEBUG, tag, "Read a byte from worker %d", data->stack->id);
     }
 
+    ui_message(UI_DEBUG, tag, "Freeing context", data->stack->id);
+    simpleftp_context_free(context);
+
     ui_message(UI_INFO, tag, "Closing socket for worker %d", data->stack->id);
     close(data->sock);
 
     ui_message(UI_INFO, tag, "Worker %d finished", data->stack->id);
+}
+
+void worker_socket_write(int socket, char *data) {
+    strcat(data, "\n");
+    write(socket, data, strlen(data));
 }

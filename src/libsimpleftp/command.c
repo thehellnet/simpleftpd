@@ -19,22 +19,10 @@
  *
  */
 
-#ifndef __SIMPLEFTPD_WORKER_H
-#define __SIMPLEFTPD_WORKER_H
+#include <stdio.h>
 
-#include "stack.h"
+#include "command.h"
 
-struct worker_data_t {
-    stack_item *stack;
-    int sock;
-    struct sockaddr_in address;
-    size_t address_len;
-};
-
-typedef struct worker_data_t worker_data;
-
-void worker_main(worker_data *data);
-
-void worker_socket_write(int socket, char *data);
-
-#endif
+void simpleftp_response_success_connection_ready(char *buffer, simpleftp_context *context) {
+    sprintf(buffer, "220 libsimpleftp server");
+}

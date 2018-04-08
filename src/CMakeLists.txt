@@ -1,3 +1,5 @@
+add_subdirectory(libsimpleftp)
+
 set(SIMPLEFTPD_SOURCES
         simpleftpd.c
         ui.c
@@ -7,8 +9,6 @@ set(SIMPLEFTPD_SOURCES
         stack.c)
 
 set(SIMPLEFTPD_HEADERS
-        default.h
-        version.h
         simpleftpd.h
         ui.h
         config.h
@@ -16,9 +16,15 @@ set(SIMPLEFTPD_HEADERS
         worker.h
         stack.h)
 
+set(SIMPLEFTPD_STANDALONE_HEADERS
+        default.h
+        version.h)
+
 add_executable(simpleftpd
         ${SIMPLEFTPD_SOURCES}
-        ${SIMPLEFTPD_HEADERS})
+        ${SIMPLEFTPD_HEADERS}
+        ${SIMPLEFTPD_STANDALONE_HEADERS})
 
 target_link_libraries(simpleftpd
-        pthread)
+        pthread
+        simpleftp)

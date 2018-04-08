@@ -19,22 +19,17 @@
  *
  */
 
-#ifndef __SIMPLEFTPD_WORKER_H
-#define __SIMPLEFTPD_WORKER_H
+#ifndef __LIBSIMPLEFTP_CONTEXT_H
+#define __LIBSIMPLEFTP_CONTEXT_H
 
-#include "stack.h"
+struct simpleftp_context_t {
 
-struct worker_data_t {
-    stack_item *stack;
-    int sock;
-    struct sockaddr_in address;
-    size_t address_len;
 };
 
-typedef struct worker_data_t worker_data;
+typedef struct simpleftp_context_t simpleftp_context;
 
-void worker_main(worker_data *data);
+void simpleftp_context_init(simpleftp_context *context);
 
-void worker_socket_write(int socket, char *data);
+void simpleftp_context_free(simpleftp_context *context);
 
 #endif
